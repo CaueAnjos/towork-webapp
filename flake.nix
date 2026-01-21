@@ -14,6 +14,7 @@
           name = "dev";
           packages = with pkgs; [
             dotnetCorePackages.sdk_10_0
+            csharpier
           ];
         };
       };
