@@ -1,10 +1,12 @@
 using Scalar.AspNetCore;
+using ToworkMVC.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddOpenApi();
+builder.Services.AddTransient<ITasksService, TasksService>();
 
 var app = builder.Build();
 
