@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using ToworkMVC.DTO;
 using ToworkMVC.Models;
 using ToworkMVC.Services;
 
@@ -17,10 +18,14 @@ public class TasksController(ITasksService tasksService) : Controller
     }
 
     [HttpPut("{id}")]
-    public IActionResult UpdateTask(int id, ToworkTask task)
+    public IActionResult UpdateTask(int id, UpdateTaskResquest request)
     {
         // TODO: return a response Task
-        return Ok(_tasks.UpdateTask(id, task));
+        var response = _tasks.UpdateTask(id, (ToworkTask)request);
+        if (response is null)
+            return NotFound();
+
+        return Ok((DefaultTaskResponse)response);
     }
 
     [HttpDelete("{id}")]
@@ -31,9 +36,12 @@ public class TasksController(ITasksService tasksService) : Controller
     }
 
     [HttpPost]
-    public IActionResult CreateTask(ToworkTask task)
+    public IActionResult CreateTask(CreateTaskRequest request)
     {
-        var response = _tasks.CreateTask(task);
-        return CreatedAtAction(nameof(CreatedAtAction), response);
+        var response = _tasks.CreateTask((ToworkTask)request);
+        if (response is null)
+            return BadRequest();
+
+        return CreatedAtAction(nameof(CreatedAtAction), (DefaultTaskResponse)response);
     }
 }
