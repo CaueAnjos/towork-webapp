@@ -31,7 +31,9 @@ public class TasksController(ITasksService tasksService) : Controller
     [HttpDelete("{id}")]
     public IActionResult DeleteTask(int id)
     {
-        _tasks.DeleteTask(id);
+        if (!_tasks.DeleteTask(id))
+            return NotFound();
+
         return NoContent();
     }
 

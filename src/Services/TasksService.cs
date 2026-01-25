@@ -19,9 +19,14 @@ public class TasksService : ITasksService
         return task;
     }
 
-    public void DeleteTask(int id)
+    public bool DeleteTask(int id)
     {
-        _tasks.RemoveAt(id);
+        if (id < _tasks.Count)
+        {
+            _tasks.RemoveAt(id);
+            return true;
+        }
+        return false;
     }
 
     public ToworkTask? UpdateTask(int id, ToworkTask task)
