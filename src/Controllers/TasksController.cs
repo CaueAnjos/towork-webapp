@@ -6,7 +6,7 @@ namespace ToworkMVC.Controllers;
 [Route("tasks")]
 public class TasksController : Controller
 {
-    [HttpGet("{id}")]
+    [HttpGet]
     public IActionResult GetTasks()
     {
         // TODO: implement!
