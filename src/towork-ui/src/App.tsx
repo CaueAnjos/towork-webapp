@@ -98,7 +98,6 @@ const TaskItem: React.FC<{ task: Task }> = ({ task }) => {
           <p
             className={`text-sm ${task.complete ? "text-gray-300" : "text-gray-600"}`}
           ></p>
-          )
         </div>
         <div className="flex gap-2">
           <button
