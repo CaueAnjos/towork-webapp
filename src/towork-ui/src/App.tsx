@@ -1,35 +1,364 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState } from "react";
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { Plus, Check, Trash2, Edit2, X, Loader2 } from "lucide-react";
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+// Types
+interface Task {
+  id: number;
+  label: string;
+  complete: boolean;
 }
 
-export default App
+const API_BASE_URL = "https://localhost:7130";
+
+// API Functions
+const fetchTasks = async (): Promise<Task[]> => {
+  const response = await fetch(`${API_BASE_URL}/api/Tasks`);
+  if (!response.ok) throw new Error("Failed to fetch tasks");
+  return response.json();
+};
+
+const createTask = async (task_label: Omit<string, "id">): Promise<Task> => {
+  const response = await fetch(`${API_BASE_URL}/api/Tasks`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ label: task_label }),
+  });
+  if (!response.ok) throw new Error("Failed to create task");
+  return response.json();
+};
+
+const updateTask = async (task: Task): Promise<Task> => {
+  const response = await fetch(`${API_BASE_URL}/api/Tasks/${task.id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(task),
+  });
+  if (!response.ok) throw new Error("Failed to update task");
+  return response.json();
+};
+
+const deleteTask = async (id: number): Promise<void> => {
+  const response = await fetch(`${API_BASE_URL}/api/Tasks/${id}`, {
+    method: "DELETE",
+  });
+  if (!response.ok) throw new Error("Failed to delete task");
+};
+
+// Task Item Component
+const TaskItem: React.FC<{ task: Task }> = ({ task }) => {
+  const queryClient = useQueryClient();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editLabel, setEditLabel] = useState(task.label);
+
+  const updateMutation = useMutation({
+    mutationFn: updateTask,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      setIsEditing(false);
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteTask,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    },
+  });
+
+  const handleToggleComplete = () => {
+    updateMutation.mutate({ ...task, complete: !task.complete });
+  };
+
+  const handleUpdate = () => {
+    updateMutation.mutate({
+      ...task,
+      label: editLabel,
+    });
+  };
+
+  if (isEditing) {
+    return (
+      <div className="bg-white rounded-xl p-6 shadow-lg border border-purple-100 animate-fadeIn">
+        <input
+          type="text"
+          value={editLabel}
+          onChange={(e) => setEditLabel(e.target.value)}
+          className="w-full mb-3 px-4 py-2 border-2 border-purple-200 rounded-lg focus:border-purple-500 focus:outline-none transition-colors"
+          placeholder="Task title"
+        />
+        <div className="flex gap-2">
+          <button
+            onClick={handleUpdate}
+            disabled={updateMutation.isPending}
+            className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+          >
+            {updateMutation.isPending ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Check className="w-4 h-4" />
+            )}
+            Save
+          </button>
+          <button
+            onClick={() => setIsEditing(false)}
+            className="px-4 py-2 border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-xl p-6 shadow-lg border border-purple-100 hover:shadow-xl transition-all duration-300 animate-fadeIn">
+      <div className="flex items-start gap-4">
+        <button
+          onClick={handleToggleComplete}
+          className={`mt-1 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+            task.complete
+              ? "bg-gradient-to-r from-purple-500 to-pink-500 border-purple-500"
+              : "border-gray-300 hover:border-purple-400"
+          }`}
+        >
+          {task.complete && <Check className="w-4 h-4 text-white" />}
+        </button>
+        <div className="flex-1">
+          <h3
+            className={`text-lg font-semibold mb-1 ${task.complete ? "line-through text-gray-400" : "text-gray-800"}`}
+          >
+            {task.label}
+          </h3>
+          <p
+            className={`text-sm ${task.complete ? "text-gray-300" : "text-gray-600"}`}
+          ></p>
+          )
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setIsEditing(true)}
+            className="p-2 hover:bg-purple-50 rounded-lg transition-colors text-purple-600"
+          >
+            <Edit2 className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => deleteMutation.mutate(task.id)}
+            disabled={deleteMutation.isPending}
+            className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-600 disabled:opacity-50"
+          >
+            {deleteMutation.isPending ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Trash2 className="w-4 h-4" />
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Add Task Form Component
+const AddTaskForm: React.FC = () => {
+  const queryClient = useQueryClient();
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const createMutation = useMutation({
+    mutationFn: createTask,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      setTitle("");
+      setDescription("");
+      setIsExpanded(false);
+    },
+  });
+
+  const handleSubmit = () => {
+    if (title.trim()) {
+      createMutation.mutate(title.trim());
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit();
+    }
+  };
+
+  return (
+    <div className="bg-white rounded-xl p-6 shadow-lg border-2 border-purple-200">
+      <div className="flex gap-3">
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          onFocus={() => setIsExpanded(true)}
+          onKeyPress={handleKeyPress}
+          placeholder="Add a new task..."
+          className="flex-1 px-4 py-3 border-2 border-purple-200 rounded-lg focus:border-purple-500 focus:outline-none transition-colors"
+        />
+        <button
+          onClick={handleSubmit}
+          disabled={!title.trim() || createMutation.isPending}
+          className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all disabled:opacity-50 flex items-center gap-2 font-semibold"
+        >
+          {createMutation.isPending ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            <Plus className="w-5 h-5" />
+          )}
+          Add
+        </button>
+      </div>
+      {isExpanded && (
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          onKeyPress={handleKeyPress}
+          placeholder="Add a description (optional)"
+          className="w-full mt-3 px-4 py-3 border-2 border-purple-200 rounded-lg focus:border-purple-500 focus:outline-none transition-colors resize-none"
+          rows={3}
+        />
+      )}
+    </div>
+  );
+};
+
+// Main App Component
+const TaskManager: React.FC = () => {
+  const {
+    data: tasks,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["tasks"],
+    queryFn: fetchTasks,
+  });
+
+  const activeTasks = tasks?.filter((t) => !t.complete) || [];
+  const completedTasks = tasks?.filter((t) => t.complete) || [];
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 py-12 px-4">
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center mb-12">
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-3">
+            Task Manager
+          </h1>
+          <p className="text-gray-600 text-lg">
+            Organize your life, one task at a time
+          </p>
+        </div>
+
+        <div className="mb-8">
+          <AddTaskForm />
+        </div>
+
+        {error && (
+          <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 mb-6 text-red-700">
+            Error loading tasks. Please check your API connection.
+          </div>
+        )}
+
+        {isLoading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="w-12 h-12 animate-spin text-purple-500" />
+          </div>
+        ) : (
+          <>
+            {activeTasks.length > 0 && (
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                  Active Tasks
+                  <span className="bg-purple-500 text-white text-sm px-3 py-1 rounded-full">
+                    {activeTasks.length}
+                  </span>
+                </h2>
+                <div className="space-y-4">
+                  {activeTasks.map((task) => (
+                    <TaskItem key={task.id} task={task} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {completedTasks.length > 0 && (
+              <div>
+                <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                  Completed
+                  <span className="bg-green-500 text-white text-sm px-3 py-1 rounded-full">
+                    {completedTasks.length}
+                  </span>
+                </h2>
+                <div className="space-y-4">
+                  {completedTasks.map((task) => (
+                    <TaskItem key={task.id} task={task} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {tasks?.length === 0 && (
+              <div className="text-center py-20">
+                <div className="bg-white rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-4 shadow-lg">
+                  <Check className="w-12 h-12 text-purple-500" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-700 mb-2">
+                  No tasks yet
+                </h3>
+                <p className="text-gray-500">
+                  Create your first task to get started!
+                </p>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      <style>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-out;
+        }
+      `}</style>
+    </div>
+  );
+};
+
+// Query Client Setup
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
+
+// Root Component
+export default function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TaskManager />
+    </QueryClientProvider>
+  );
+}
