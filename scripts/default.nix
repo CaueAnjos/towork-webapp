@@ -30,6 +30,19 @@
         });
       };
 
+      "dev:ui" = {
+        program = lib.getExe (pkgs.writeShellApplication {
+          name = "start-db";
+          runtimeInputs = with pkgs; [
+            pnpm_9
+          ];
+          text = ''
+            cd src/towork-ui
+            pnpm run dev
+          '';
+        });
+      };
+
       "dev:db" = apps."dev:db-up";
       "dev:db-up" = {
         program = lib.getExe (pkgs.writeShellApplication {

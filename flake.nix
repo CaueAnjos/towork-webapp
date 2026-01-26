@@ -17,9 +17,13 @@
         devShells.default = pkgs.mkShellNoCC {
           name = "dev";
           packages = with pkgs; [
+            # NOTE: C#
             dotnetCorePackages.sdk_10_0
             csharpier
+
+            # NOTE: js/ts
             nodejs_20
+            pnpm_9
 
             # NOTE: for containers
             podman
