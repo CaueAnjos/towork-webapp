@@ -127,16 +127,12 @@ const TaskItem: React.FC<{ task: Task }> = ({ task }) => {
 const AddTaskForm: React.FC = () => {
   const queryClient = useQueryClient();
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [isExpanded, setIsExpanded] = useState(false);
 
   const createMutation = useMutation({
     mutationFn: createTask,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
       setTitle("");
-      setDescription("");
-      setIsExpanded(false);
     },
   });
 
@@ -160,7 +156,6 @@ const AddTaskForm: React.FC = () => {
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          onFocus={() => setIsExpanded(true)}
           onKeyPress={handleKeyPress}
           placeholder="Add a new task..."
           className="flex-1 px-4 py-3 border-2 border-purple-200 rounded-lg focus:border-purple-500 focus:outline-none transition-colors"
@@ -178,16 +173,6 @@ const AddTaskForm: React.FC = () => {
           Add
         </button>
       </div>
-      {isExpanded && (
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          onKeyPress={handleKeyPress}
-          placeholder="Add a description (optional)"
-          className="w-full mt-3 px-4 py-3 border-2 border-purple-200 rounded-lg focus:border-purple-500 focus:outline-none transition-colors resize-none"
-          rows={3}
-        />
-      )}
     </div>
   );
 };
