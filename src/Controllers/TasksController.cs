@@ -6,7 +6,7 @@ using ToworkMVC.Services;
 namespace ToworkMVC.Controllers;
 
 [ApiController]
-[Route("tasks")]
+[Route("api/[controller]")]
 public class TasksController(ITasksService tasksService) : Controller
 {
     private ITasksService _tasks = tasksService;
