@@ -13,8 +13,22 @@ builder.Services.AddDbContext<TasksContext>(options =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("TasksContext"));
 });
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(
+        name: "allowed",
+        policy =>
+        {
+            policy
+                .WithOrigins("http://localhost:4173", "http://localhost:5173")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        }
+    );
+});
 
 var app = builder.Build();
+app.UseCors("allowed");
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
