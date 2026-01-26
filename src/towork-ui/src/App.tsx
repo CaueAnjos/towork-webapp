@@ -7,49 +7,8 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { Plus, Check, Trash2, Edit2, X, Loader2 } from "lucide-react";
-
-// Types
-interface Task {
-  id: number;
-  label: string;
-  complete: boolean;
-}
-
-const API_BASE_URL = "https://localhost:7130";
-
-// API Functions
-const fetchTasks = async (): Promise<Task[]> => {
-  const response = await fetch(`${API_BASE_URL}/api/Tasks`);
-  if (!response.ok) throw new Error("Failed to fetch tasks");
-  return response.json();
-};
-
-const createTask = async (task_label: Omit<string, "id">): Promise<Task> => {
-  const response = await fetch(`${API_BASE_URL}/api/Tasks`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ label: task_label }),
-  });
-  if (!response.ok) throw new Error("Failed to create task");
-  return response.json();
-};
-
-const updateTask = async (task: Task): Promise<Task> => {
-  const response = await fetch(`${API_BASE_URL}/api/Tasks/${task.id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(task),
-  });
-  if (!response.ok) throw new Error("Failed to update task");
-  return response.json();
-};
-
-const deleteTask = async (id: number): Promise<void> => {
-  const response = await fetch(`${API_BASE_URL}/api/Tasks/${id}`, {
-    method: "DELETE",
-  });
-  if (!response.ok) throw new Error("Failed to delete task");
-};
+import { fetchTasks, updateTask, createTask, deleteTask } from "./ToworkApi.ts";
+import type { Task } from "./ToworkApi.ts";
 
 // Task Item Component
 const TaskItem: React.FC<{ task: Task }> = ({ task }) => {
