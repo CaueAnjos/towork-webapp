@@ -1,4 +1,6 @@
+using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
+using ToworkMVC.Models;
 using ToworkMVC.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,6 +9,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddOpenApi();
 builder.Services.AddTransient<ITasksService, TasksService>();
+builder.Services.AddDbContext<TasksContext>(options =>
+{
+    options.UseNpgsql(builder.Configuration.GetConnectionString("TasksContext"));
+});
 
 var app = builder.Build();
 
