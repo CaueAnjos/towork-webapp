@@ -19,6 +19,7 @@
           packages = with pkgs; [
             dotnetCorePackages.sdk_10_0
             csharpier
+            nodejs_20
 
             # NOTE: for containers
             podman
