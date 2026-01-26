@@ -44,19 +44,19 @@ const TaskItem: React.FC<{ task: Task }> = ({ task }) => {
 
   if (isEditing) {
     return (
-      <div className="bg-white rounded-xl p-6 shadow-lg border border-purple-100 animate-fadeIn">
+      <div className="bg-white rounded-xl p-6 shadow-lg border border-blue-100 animate-fadeIn">
         <input
           type="text"
           value={editLabel}
           onChange={(e) => setEditLabel(e.target.value)}
-          className="w-full mb-3 px-4 py-2 border-2 border-purple-200 rounded-lg focus:border-purple-500 focus:outline-none transition-colors"
+          className="w-full mb-3 px-4 py-2 border-2 border-blue-200 rounded-lg focus:border-blue-500 focus:outline-none transition-colors"
           placeholder="Task title"
         />
         <div className="flex gap-2">
           <button
             onClick={handleUpdate}
             disabled={updateMutation.isPending}
-            className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+            className="flex-1 bg-gradient-to-r from-blue-500 to-purple-500 text-white px-4 py-2 rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {updateMutation.isPending ? (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -77,14 +77,14 @@ const TaskItem: React.FC<{ task: Task }> = ({ task }) => {
   }
 
   return (
-    <div className="bg-white rounded-xl p-6 shadow-lg border border-purple-100 hover:shadow-xl transition-all duration-300 animate-fadeIn">
+    <div className="bg-white rounded-xl p-6 shadow-lg border border-blue-100 hover:shadow-xl transition-all duration-300 animate-fadeIn">
       <div className="flex items-start gap-4">
         <button
           onClick={handleToggleComplete}
           className={`mt-1 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
             task.complete
-              ? "bg-gradient-to-r from-purple-500 to-pink-500 border-purple-500"
-              : "border-gray-300 hover:border-purple-400"
+              ? "bg-gradient-to-r from-blue-500 to-purple-500 border-blue-500"
+              : "border-gray-300 hover:border-blue-400"
           }`}
         >
           {task.complete && <Check className="w-4 h-4 text-white" />}
@@ -102,7 +102,7 @@ const TaskItem: React.FC<{ task: Task }> = ({ task }) => {
         <div className="flex gap-2">
           <button
             onClick={() => setIsEditing(true)}
-            className="p-2 hover:bg-purple-50 rounded-lg transition-colors text-purple-600"
+            className="p-2 hover:bg-blue-50 rounded-lg transition-colors text-blue-600"
           >
             <Edit2 className="w-4 h-4" />
           </button>
@@ -150,7 +150,7 @@ const AddTaskForm: React.FC = () => {
   };
 
   return (
-    <div className="bg-white rounded-xl p-6 shadow-lg border-2 border-purple-200">
+    <div className="bg-white rounded-xl p-6 shadow-lg border-2 border-blue-200">
       <div className="flex gap-3">
         <input
           type="text"
@@ -158,12 +158,12 @@ const AddTaskForm: React.FC = () => {
           onChange={(e) => setTitle(e.target.value)}
           onKeyPress={handleKeyPress}
           placeholder="Add a new task..."
-          className="flex-1 px-4 py-3 border-2 border-purple-200 rounded-lg focus:border-purple-500 focus:outline-none transition-colors"
+          className="flex-1 px-4 py-3 border-2 border-blue-200 rounded-lg focus:border-blue-500 focus:outline-none transition-colors"
         />
         <button
           onClick={handleSubmit}
           disabled={!title.trim() || createMutation.isPending}
-          className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all disabled:opacity-50 flex items-center gap-2 font-semibold"
+          className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-6 py-3 rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all disabled:opacity-50 flex items-center gap-2 font-semibold"
         >
           {createMutation.isPending ? (
             <Loader2 className="w-5 h-5 animate-spin" />
@@ -192,10 +192,10 @@ const TaskManager: React.FC = () => {
   const completedTasks = tasks?.filter((t) => t.complete) || [];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-blue-50 py-12 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-3">
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-3">
             Towork-Webapp
           </h1>
           <p className="text-gray-600 text-lg">
@@ -215,7 +215,7 @@ const TaskManager: React.FC = () => {
 
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-12 h-12 animate-spin text-purple-500" />
+            <Loader2 className="w-12 h-12 animate-spin text-blue-500" />
           </div>
         ) : (
           <>
@@ -223,7 +223,7 @@ const TaskManager: React.FC = () => {
               <div className="mb-8">
                 <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                   Active Tasks
-                  <span className="bg-purple-500 text-white text-sm px-3 py-1 rounded-full">
+                  <span className="bg-blue-500 text-white text-sm px-3 py-1 rounded-full">
                     {activeTasks.length}
                   </span>
                 </h2>
@@ -254,7 +254,7 @@ const TaskManager: React.FC = () => {
             {tasks?.length === 0 && (
               <div className="text-center py-20">
                 <div className="bg-white rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-4 shadow-lg">
-                  <Check className="w-12 h-12 text-purple-500" />
+                  <Check className="w-12 h-12 text-blue-500" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-700 mb-2">
                   No tasks yet
