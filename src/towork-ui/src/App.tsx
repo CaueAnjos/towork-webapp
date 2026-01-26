@@ -211,7 +211,7 @@ const TaskManager: React.FC = () => {
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-3">
-            Task Manager
+            Towork-Webapp
           </h1>
           <p className="text-gray-600 text-lg">
             Organize your life, one task at a time
