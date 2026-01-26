@@ -18,10 +18,10 @@ public class TasksController(ITasksService tasksService) : Controller
     }
 
     [HttpPut("{id}")]
-    public IActionResult UpdateTask(int id, UpdateTaskResquest request)
+    public async Task<IActionResult> UpdateTask(int id, UpdateTaskResquest request)
     {
         // TODO: return a response Task
-        var response = _tasks.UpdateTask(id, (ToworkTask)request);
+        var response = await _tasks.UpdateTask(id, (ToworkTask)request);
         if (response is null)
             return NotFound();
 
@@ -29,18 +29,18 @@ public class TasksController(ITasksService tasksService) : Controller
     }
 
     [HttpDelete("{id}")]
-    public IActionResult DeleteTask(int id)
+    public async Task<IActionResult> DeleteTask(int id)
     {
-        if (!_tasks.DeleteTask(id))
+        if (!await _tasks.DeleteTask(id))
             return NotFound();
 
         return NoContent();
     }
 
     [HttpPost]
-    public IActionResult CreateTask(CreateTaskRequest request)
+    public async Task<IActionResult> CreateTask(CreateTaskRequest request)
     {
-        var response = _tasks.CreateTask((ToworkTask)request);
+        var response = await _tasks.CreateTask((ToworkTask)request);
         if (response is null)
             return BadRequest();
 

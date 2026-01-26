@@ -2,41 +2,42 @@ using ToworkMVC.Models;
 
 namespace ToworkMVC.Services;
 
-public class TasksService : ITasksService
+public class TasksService(TasksContext tasksContext) : ITasksService
 {
-    // TODO: Use a DbContex instead!
-    private List<ToworkTask> _tasks = [];
+    private TasksContext _context = tasksContext;
 
     public List<ToworkTask> GetTasks()
     {
-        return _tasks;
+        return _context.Tasks.ToList();
     }
 
-    public ToworkTask CreateTask(ToworkTask task)
+    public async Task<ToworkTask> CreateTask(ToworkTask task)
     {
-        task.Id = _tasks.Count;
-        _tasks.Add(task);
+        await _context.Tasks.AddAsync(task);
+        await _context.SaveChangesAsync();
         return task;
     }
 
-    public bool DeleteTask(int id)
+    public async Task<bool> DeleteTask(int id)
     {
-        if (id < _tasks.Count)
-        {
-            _tasks.RemoveAt(id);
-            return true;
-        }
-        return false;
+        ToworkTask? taskToDelete = await _context.Tasks.FindAsync(id);
+        if (taskToDelete is null)
+            return false;
+
+        _context.Tasks.Remove(taskToDelete);
+        await _context.SaveChangesAsync();
+        return true;
     }
 
-    public ToworkTask? UpdateTask(int id, ToworkTask task)
+    public async Task<ToworkTask?> UpdateTask(int id, ToworkTask task)
     {
-        ToworkTask? t = _tasks.FirstOrDefault(t => t.Id == id);
+        ToworkTask? t = await _context.Tasks.FindAsync(id);
         if (t is null)
             return null;
 
         t.Complete = task.Complete;
         t.Label = task.Label;
+        await _context.SaveChangesAsync();
         return t;
     }
 }

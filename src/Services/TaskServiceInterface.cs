@@ -5,7 +5,7 @@ namespace ToworkMVC.Services;
 public interface ITasksService
 {
     public List<ToworkTask> GetTasks();
-    public ToworkTask CreateTask(ToworkTask task);
-    public bool DeleteTask(int id);
-    public ToworkTask? UpdateTask(int id, ToworkTask task);
+    public Task<ToworkTask> CreateTask(ToworkTask task);
+    public Task<bool> DeleteTask(int id);
+    public Task<ToworkTask?> UpdateTask(int id, ToworkTask task);
 }
