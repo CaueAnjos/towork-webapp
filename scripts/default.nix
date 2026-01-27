@@ -3,66 +3,60 @@
     pkgs,
     lib,
     ...
-  }: rec {
+  }: let
+    mkProgram = name: desc: runtimeInputs: text: rec {
+      inherit name desc;
+      script = pkgs.writeShellApplication {
+        inherit name runtimeInputs text;
+      };
+    };
+
+    mkApp = {
+      desc,
+      script,
+      ...
+    }: {
+      program = lib.getExe script;
+      meta.description = desc;
+    };
+
+    programs = {
+      webapp =
+        mkProgram "start-webapp"
+        "runs the ToworkMVC server with postgresql server" [
+          pkgs.podman
+          programs.db-up.script
+          programs.db-down.script
+        ]
+        (builtins.readFile ./start-webapp.bash);
+
+      db-up =
+        mkProgram "start-db"
+        "starts the postgresql server"
+        [pkgs.podman]
+        (builtins.readFile ./start-up-db.bash);
+      db-down =
+        mkProgram "end-db"
+        "ends postgresql server"
+        [pkgs.podman]
+        (builtins.readFile ./end-up-db.bash);
+
+      ui =
+        mkProgram "start-ui"
+        "starts towork-ui server"
+        [pkgs.pnpm_9]
+        (builtins.readFile ./start-ui.bash);
+    };
+  in rec {
     apps = {
       "dev" = apps."dev:webapp";
-      "dev:webapp" = {
-        program = lib.getExe (pkgs.writeShellApplication {
-          name = "start-dev";
-          runtimeInputs = with pkgs; [
-            podman
-          ];
-          text = ''
-            # shellcheck disable=SC1091
-            set -e
+      "dev:webapp" = mkApp programs.webapp;
 
-            ${apps."dev:db-up".program}
-
-            cleanup() {
-                ${apps."dev:db-down".program}
-            }
-
-            trap cleanup EXIT
-
-            dotnet ef database update --project src/ToworkMVC
-            dotnet watch run --project src/ToworkMVC -lp https
-          '';
-        });
-      };
-
-      "dev:ui" = {
-        program = lib.getExe (pkgs.writeShellApplication {
-          name = "start-db";
-          runtimeInputs = with pkgs; [
-            pnpm_9
-          ];
-          text = ''
-            cd src/towork-ui
-            pnpm run dev
-          '';
-        });
-      };
+      "dev:ui" = mkApp programs.ui;
 
       "dev:db" = apps."dev:db-up";
-      "dev:db-up" = {
-        program = lib.getExe (pkgs.writeShellApplication {
-          name = "start-db";
-          runtimeInputs = with pkgs; [
-            podman
-          ];
-          text = builtins.readFile ./start-up-db.bash;
-        });
-      };
-
-      "dev:db-down" = {
-        program = lib.getExe (pkgs.writeShellApplication {
-          name = "end-db";
-          runtimeInputs = with pkgs; [
-            podman
-          ];
-          text = builtins.readFile ./end-up-db.bash;
-        });
-      };
+      "dev:db-up" = mkApp programs.db-up;
+      "dev:db-down" = mkApp programs.db-down;
     };
   };
 }
