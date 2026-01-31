@@ -33,4 +33,6 @@ in
       "DOTNET_CONTENTROOT"
       "${placeholder "out"}/lib/${pname}"
     ];
+
+    meta.mainProgram = "ToworkMVC";
   }
