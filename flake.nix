@@ -34,7 +34,14 @@
             skopeo
             slirp4netns
             fuse-overlayfs
+
+            # NOTE: Azure
+            azure-cli
           ];
+
+          env = {
+            DOCKER_COMMAND = "podman";
+          };
 
           shellHook = let
             podmanSetupScript = let
