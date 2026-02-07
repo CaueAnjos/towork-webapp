@@ -1,4 +1,5 @@
-const API_BASE_URL = "https://localhost:7130";
+const env = import.meta.env.MODE;
+const API_BASE_URL = env === "Development" ? "https://localhost:7130" : "";
 
 export interface Task {
   id: number;
