@@ -7,7 +7,13 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { Plus, Check, Trash2, Edit2, X, Loader2 } from "lucide-react";
-import { fetchTasks, updateTask, createTask, deleteTask } from "./ToworkApi.ts";
+import {
+  fetchTasks,
+  updateTask,
+  createTask,
+  deleteTask,
+  mapClientId,
+} from "./ToworkApi.ts";
 import type { Task } from "./ToworkApi.ts";
 
 // Task Item Component
@@ -18,9 +24,34 @@ const TaskItem: React.FC<{ task: Task }> = ({ task }) => {
 
   const updateMutation = useMutation({
     mutationFn: updateTask,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    onMutate: async (task: Task, context) => {
+      await context.client.cancelQueries({ queryKey: ["tasks"] });
+      const previousTask = context.client.getQueryData<Task | undefined>([
+        "tasks",
+        task.id,
+      ]);
+      console.log(context.client.getQueryData(["tasks"]));
+      context.client.setQueryData(["tasks", task.id], task);
+
       setIsEditing(false);
+
+      return { previousTask };
+    },
+    onError: (_err, task, onMutationResult, context) => {
+      let newData = onMutationResult?.previousTask;
+      if (newData) {
+        newData.clientId = task.clientId;
+      }
+
+      context.client.setQueryData(["tasks", task.id], newData);
+    },
+    onSuccess: (data, task, _onMutationResult, context) => {
+      let newData = data;
+      newData.clientId = task.clientId;
+      context.client.setQueryData(["tasks", task.id], newData);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
     },
   });
 
@@ -107,15 +138,10 @@ const TaskItem: React.FC<{ task: Task }> = ({ task }) => {
             <Edit2 className="w-4 h-4" />
           </button>
           <button
-            onClick={() => deleteMutation.mutate(task.id)}
-            disabled={deleteMutation.isPending}
+            onClick={() => deleteMutation.mutate(task.id ?? 0)}
             className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-600 disabled:opacity-50"
           >
-            {deleteMutation.isPending ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Trash2 className="w-4 h-4" />
-            )}
+            <Trash2 className="w-4 h-4" />
           </button>
         </div>
       </div>
@@ -130,9 +156,36 @@ const AddTaskForm: React.FC = () => {
 
   const createMutation = useMutation({
     mutationFn: createTask,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    onMutate: async (label: string, context) => {
+      await context.client.cancelQueries({ queryKey: ["tasks"] });
+      const previousTasks = context.client.getQueryData<Task[]>(["tasks"]);
+
+      let task: Task = {
+        clientId: "",
+        id: undefined,
+        label: label,
+        complete: false,
+      };
+      mapClientId(task);
+
+      context.client.setQueryData(["tasks"], (old: Task[]) => [...old, task]);
       setTitle("");
+
+      return { previousTasks, clientId: task.clientId };
+    },
+    onError: (_err, label, onMutateResult, context) => {
+      context.client.setQueryData(["tasks"], onMutateResult?.previousTasks);
+      setTitle(label);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    },
+    onSuccess: (data, _label, onMutateResult, context) => {
+      let newData = data;
+      newData.clientId = onMutateResult.clientId;
+      mapClientId(newData);
+
+      context.client.setQueryData(["tasks", onMutateResult.clientId], newData);
     },
   });
 
@@ -142,7 +195,7 @@ const AddTaskForm: React.FC = () => {
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSubmit();
@@ -156,13 +209,13 @@ const AddTaskForm: React.FC = () => {
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          onKeyPress={handleKeyPress}
+          onKeyDown={handleKeyDown}
           placeholder="Add a new task..."
           className="flex-1 px-4 py-3 border-2 border-blue-200 rounded-lg focus:border-blue-500 focus:outline-none transition-colors"
         />
         <button
           onClick={handleSubmit}
-          disabled={!title.trim() || createMutation.isPending}
+          disabled={!title.trim()}
           className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-6 py-3 rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all disabled:opacity-50 flex items-center gap-2 font-semibold"
         >
           {createMutation.isPending ? (
@@ -186,10 +239,11 @@ const TaskManager: React.FC = () => {
   } = useQuery({
     queryKey: ["tasks"],
     queryFn: fetchTasks,
+    select: (data) => data.map((e) => mapClientId(e)),
   });
 
-  const activeTasks = tasks?.filter((t) => !t.complete) || [];
-  const completedTasks = tasks?.filter((t) => t.complete) || [];
+  const activeTasks = tasks?.filter((t) => (t ? !t.complete : true)) || [];
+  const completedTasks = tasks?.filter((t) => (t ? t.complete : false)) || [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-blue-50 py-12 px-4">
@@ -229,7 +283,7 @@ const TaskManager: React.FC = () => {
                 </h2>
                 <div className="space-y-4">
                   {activeTasks.map((task) => (
-                    <TaskItem key={task.id} task={task} />
+                    <TaskItem key={task.clientId} task={task} />
                   ))}
                 </div>
               </div>
@@ -245,7 +299,7 @@ const TaskManager: React.FC = () => {
                 </h2>
                 <div className="space-y-4">
                   {completedTasks.map((task) => (
-                    <TaskItem key={task.id} task={task} />
+                    <TaskItem key={task.clientId} task={task} />
                   ))}
                 </div>
               </div>
