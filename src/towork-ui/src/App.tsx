@@ -57,7 +57,18 @@ const TaskItem: React.FC<{ task: Task }> = ({ task }) => {
 
   const deleteMutation = useMutation({
     mutationFn: deleteTask,
-    onSuccess: () => {
+    onMutate: async (deletedId: number, context) => {
+      await context.client.cancelQueries({ queryKey: ["tasks"] });
+      const previousTasks = context.client.getQueryData(["tasks"]);
+      context.client.setQueryData(["tasks"], (old: Task[]) =>
+        old.filter((t) => t.id != deletedId),
+      );
+      return { previousTasks };
+    },
+    onError: (_err, _deletedId, onMutateResult, context) => {
+      context.client.setQueryData(["tasks"], onMutateResult?.previousTasks);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
     },
   });
