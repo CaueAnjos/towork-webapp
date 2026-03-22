@@ -350,7 +350,8 @@ const TaskManager: React.FC = () => {
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      refetchOnWindowFocus: false,
+      refetchOnWindowFocus: true,
+      refetchInterval: 2000,
       retry: 1,
     },
   },
