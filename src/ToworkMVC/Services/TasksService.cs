@@ -8,7 +8,7 @@ public class TasksService(TasksContext tasksContext) : ITasksService
 
     public List<ToworkTask> GetTasks()
     {
-        return _context.Tasks.ToList();
+        return _context.Tasks.OrderBy((e) => e.Id).ToList();
     }
 
     public async Task<ToworkTask> CreateTask(ToworkTask task)

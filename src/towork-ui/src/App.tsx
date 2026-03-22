@@ -26,29 +26,25 @@ const TaskItem: React.FC<{ task: Task }> = ({ task }) => {
     mutationFn: updateTask,
     onMutate: async (task: Task, context) => {
       await context.client.cancelQueries({ queryKey: ["tasks"] });
-      const previousTask = context.client.getQueryData<Task | undefined>([
-        "tasks",
-        task.id,
-      ]);
-      console.log(context.client.getQueryData(["tasks"]));
-      context.client.setQueryData(["tasks", task.id], task);
+      const previousTasks = context.client.getQueryData(["tasks"]);
+
+      context.client.setQueryData(["tasks"], (old: Task[]) =>
+        old.map((e) => {
+          if (e.clientId == task.clientId) {
+            return task;
+          }
+          return e;
+        }),
+      );
 
       setIsEditing(false);
 
-      return { previousTask };
+      return { previousTasks };
     },
     onError: (_err, task, onMutationResult, context) => {
-      let newData = onMutationResult?.previousTask;
-      if (newData) {
-        newData.clientId = task.clientId;
-      }
-
-      context.client.setQueryData(["tasks", task.id], newData);
-    },
-    onSuccess: (data, task, _onMutationResult, context) => {
-      let newData = data;
-      newData.clientId = task.clientId;
-      context.client.setQueryData(["tasks", task.id], newData);
+      setIsEditing(true);
+      setEditLabel(task.label);
+      context.client.setQueryData(["tasks"], onMutationResult?.previousTasks);
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
@@ -191,12 +187,10 @@ const AddTaskForm: React.FC = () => {
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
     },
-    onSuccess: (data, _label, onMutateResult, context) => {
+    onSuccess: (data, _label, onMutateResult, _context) => {
       let newData = data;
       newData.clientId = onMutateResult.clientId;
       mapClientId(newData);
-
-      context.client.setQueryData(["tasks", onMutateResult.clientId], newData);
     },
   });
 
