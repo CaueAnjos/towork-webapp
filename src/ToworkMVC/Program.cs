@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Scalar.AspNetCore;
 using ToworkMVC.Models;
 using ToworkMVC.Services;
@@ -30,6 +31,9 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 app.UseCors("allowed");
 
+var uiRoot = GetUiRootPath(builder.Environment);
+var uiFileProvider = new PhysicalFileProvider(uiRoot);
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -48,9 +52,27 @@ app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapStaticAssets();
+app.UseDefaultFiles(new DefaultFilesOptions { FileProvider = uiFileProvider });
+app.UseStaticFiles(new StaticFileOptions { FileProvider = uiFileProvider });
 
-app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
+app.MapControllers();
+
+app.MapFallback(async context =>
+{
+    context.Response.ContentType = "text/html";
+    await context.Response.SendFileAsync(Path.Combine(uiRoot, "index.html"));
+});
 
 app.Run();
+
+static string GetUiRootPath(IWebHostEnvironment environment)
+{
+    var devUiRoot = Environment.GetEnvironmentVariable("TOWORK_UI_ROOT");
+    if (!string.IsNullOrWhiteSpace(devUiRoot) && Directory.Exists(devUiRoot))
+        return devUiRoot;
+
+    if (!string.IsNullOrWhiteSpace(environment.WebRootPath) && Directory.Exists(environment.WebRootPath))
+        return environment.WebRootPath;
+
+    return Path.Combine(environment.ContentRootPath, "wwwroot");
+}

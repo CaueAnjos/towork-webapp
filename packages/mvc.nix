@@ -2,6 +2,7 @@
   lib,
   buildDotnetModule,
   dotnetCorePackages,
+  ui,
 }: let
   inherit (lib.fileset) toSource unions fileFilter;
   inherit (lib.fileset) trace;
@@ -33,6 +34,11 @@ in
       "DOTNET_CONTENTROOT"
       "${placeholder "out"}/lib/${pname}"
     ];
+
+    postInstall = ''
+      mkdir -p $out/lib/${pname}/wwwroot
+      cp -r ${ui}/. $out/lib/${pname}/wwwroot/
+    '';
 
     meta.mainProgram = "ToworkMVC";
   }

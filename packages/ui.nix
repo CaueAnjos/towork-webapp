@@ -14,7 +14,7 @@ stdenv.mkDerivation (finalAttrs: {
   pnpmDeps = pnpm_9.fetchDeps {
     inherit (finalAttrs) pname version src;
     fetcherVersion = 1;
-    hash = "sha256-HvQy6zFm+VEafjRlK8+RY44dy+tBwjxAA33miFeHU8M=";
+    hash = "sha256-VDYXESaWA92f8KWvrMmVFWMn3BLkp+njErq8Pq/MUlM=";
   };
 
   configurePhase = ''
@@ -28,6 +28,6 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   installPhase = ''
-    cp -r dist $out
+    cp -r dist/. $out/
   '';
 })
