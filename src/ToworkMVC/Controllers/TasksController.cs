@@ -17,6 +17,12 @@ public class TasksController(ITasksService tasksService) : Controller
         return Json(_tasks.GetTasks());
     }
 
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetTask(int id)
+    {
+        return Json(await _tasks.GetTask(id));
+    }
+
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateTask(int id, UpdateTaskResquest request)
     {
@@ -44,6 +50,10 @@ public class TasksController(ITasksService tasksService) : Controller
         if (response is null)
             return BadRequest();
 
-        return CreatedAtAction(nameof(CreatedAtAction), (DefaultTaskResponse)response);
+        return CreatedAtAction(
+            nameof(GetTask),
+            new { id = response.Id },
+            (DefaultTaskResponse)response
+        );
     }
 }

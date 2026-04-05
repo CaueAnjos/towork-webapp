@@ -11,6 +11,11 @@ public class TasksService(TasksContext tasksContext) : ITasksService
         return _context.Tasks.OrderBy((e) => e.Id).ToList();
     }
 
+    public async Task<ToworkTask?> GetTask(int id)
+    {
+        return await _context.Tasks.FindAsync(id);
+    }
+
     public async Task<ToworkTask> CreateTask(ToworkTask task)
     {
         await _context.Tasks.AddAsync(task);
