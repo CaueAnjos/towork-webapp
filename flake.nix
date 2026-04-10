@@ -4,11 +4,12 @@
   inputs = {
     flake-parts.url = "github:hercules-ci/flake-parts";
     nixpkgs.url = "github:NixOS/nixpkgs/25.11";
+    systems.url = "github:nix-systems/default";
   };
 
   outputs = inputs @ {flake-parts, ...}:
     flake-parts.lib.mkFlake {inherit inputs;} {
-      systems = ["x86_64-linux" "aarch64-linux" "aarch64-darwin" "x86_64-darwin"];
+      systems = import inputs.systems;
       imports = [
         ./scripts
         ./packages
@@ -19,8 +20,8 @@
           name = "dev";
           packages = with pkgs; [
             # NOTE: C#
-            dotnetCorePackages.sdk_10_0
             csharpier
+            dotnetCorePackages.sdk_10_0
 
             # NOTE: js/ts
             nodejs_20
