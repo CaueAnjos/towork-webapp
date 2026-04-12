@@ -42,7 +42,6 @@
 
           env = {
             DOCKER_COMMAND = "podman";
-            ASPNETCORE_ENVIRONMENT = "Development";
           };
 
           shellHook = let

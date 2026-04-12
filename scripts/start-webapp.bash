@@ -2,8 +2,8 @@
 
 set -e
 
-pnpm --dir src/towork-ui install --frozen-lockfile
-pnpm --dir src/towork-ui run build
+pnpm --dir src/client install --frozen-lockfile
+pnpm --dir src/client run build
 
 start-db
 
@@ -13,5 +13,5 @@ cleanup() {
 
 trap cleanup EXIT
 
-dotnet ef database update --project src/ToworkMVC
-TOWORK_UI_ROOT="$(pwd)/src/towork-ui/dist" dotnet watch run --project src/ToworkMVC -lp https
+dotnet ef database update --project src/towork
+TOWORK_UI_ROOT="$(pwd)/src/client/dist" dotnet watch run --project src/towork -lp https

@@ -5,11 +5,6 @@
     "hash": "sha256-EXvojddPu+9JKgOG9NSQgUTfWq1RpOYw7adxDPKDJ6o="
   },
   {
-    "pname": "Microsoft.AspNetCore.App.Internal.Assets",
-    "version": "10.0.0",
-    "hash": "sha256-IyY5Ymdkmf9S9qRwYXX9rWpzcU3fuDR+ITeaaeJQ/Dk="
-  },
-  {
     "pname": "Microsoft.AspNetCore.OpenApi",
     "version": "10.0.2",
     "hash": "sha256-FU57fPXL4NUDRqi+rLresi4yKttv1KcAnLuEdPCyTos="
@@ -55,6 +50,11 @@
     "hash": "sha256-+58+iqTayTiE0pDaog1U8mjaDA8bNNDLA8gjCQZZudo="
   },
   {
+    "pname": "Microsoft.Data.Sqlite.Core",
+    "version": "10.0.2",
+    "hash": "sha256-gpArXkjFSk62NA88ZYwWc0m4/2UsJyd9/8TCAsI8u4w="
+  },
+  {
     "pname": "Microsoft.EntityFrameworkCore",
     "version": "10.0.2",
     "hash": "sha256-FS6T8EnaWCMtj4PnZhh+oF8mcM44VlM3wkTSMlpte9A="
@@ -83,6 +83,16 @@
     "pname": "Microsoft.EntityFrameworkCore.Relational",
     "version": "10.0.2",
     "hash": "sha256-Y4jPpoYhKizg5wF6QfkBX4sYlE2FU1bYhfoDN3xkhKM="
+  },
+  {
+    "pname": "Microsoft.EntityFrameworkCore.Sqlite",
+    "version": "10.0.2",
+    "hash": "sha256-s/bwWC9SdFKr93Oz57pImCB6hf/FYa+sCxtMYC7w+vQ="
+  },
+  {
+    "pname": "Microsoft.EntityFrameworkCore.Sqlite.Core",
+    "version": "10.0.2",
+    "hash": "sha256-oIw6neqiY9JUyYg1lNi92ddDq6pWVOsn7DIBlGPOh+A="
   },
   {
     "pname": "Microsoft.Extensions.ApiDescription.Server",
@@ -128,6 +138,26 @@
     "pname": "Scalar.AspNetCore",
     "version": "2.12.18",
     "hash": "sha256-dVZrNEmY/Yp04ocRbvwK79sMh44eDV30CNQDLRVPENA="
+  },
+  {
+    "pname": "SQLitePCLRaw.bundle_e_sqlite3",
+    "version": "2.1.11",
+    "hash": "sha256-kWRapMTVEfcc0DxnI9Ai1+RwAAcR2+HUu+WF+OeLJCs="
+  },
+  {
+    "pname": "SQLitePCLRaw.core",
+    "version": "2.1.11",
+    "hash": "sha256-s/fxEoYlNf9c2C4HZueMzPCBvpiViDVlSpg7epB0GXY="
+  },
+  {
+    "pname": "SQLitePCLRaw.lib.e_sqlite3",
+    "version": "2.1.11",
+    "hash": "sha256-ZmffbHNgnLUdsPbikilEAihxXl1MedIBQ1Xzt9226Bw="
+  },
+  {
+    "pname": "SQLitePCLRaw.provider.e_sqlite3",
+    "version": "2.1.11",
+    "hash": "sha256-LdfV325AmYgBOwmwP7MNZxMJZkNO6bwrHvB6C5SyItA="
   },
   {
     "pname": "System.CodeDom",

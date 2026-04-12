@@ -12,7 +12,20 @@ builder.Services.AddOpenApi();
 builder.Services.AddTransient<ITasksService, TasksService>();
 builder.Services.AddDbContext<TasksContext>(options =>
 {
-    options.UseNpgsql(builder.Configuration.GetConnectionString("TasksContext"));
+    string? connectionString = builder.Configuration.GetConnectionString("TasksContext");
+    if (connectionString is not null)
+    {
+        options.UseNpgsql(connectionString);
+    }
+    else
+    {
+        var path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        var appFolder = Path.Combine(path, "towork");
+        Directory.CreateDirectory(appFolder);
+
+        var dbPath = Path.Combine(appFolder, "data.db");
+        options.UseSqlite($"Data Source={dbPath}");
+    }
 });
 builder.Services.AddCors(options =>
 {
@@ -29,6 +42,16 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<TasksContext>();
+    if (db.Database.IsSqlite())
+    {
+        db.Database.EnsureCreated();
+    }
+}
+
 app.UseCors("allowed");
 
 var uiRoot = GetUiRootPath(builder.Environment);
@@ -71,7 +94,10 @@ static string GetUiRootPath(IWebHostEnvironment environment)
     if (!string.IsNullOrWhiteSpace(devUiRoot) && Directory.Exists(devUiRoot))
         return devUiRoot;
 
-    if (!string.IsNullOrWhiteSpace(environment.WebRootPath) && Directory.Exists(environment.WebRootPath))
+    if (
+        !string.IsNullOrWhiteSpace(environment.WebRootPath)
+        && Directory.Exists(environment.WebRootPath)
+    )
         return environment.WebRootPath;
 
     return Path.Combine(environment.ContentRootPath, "wwwroot");
