@@ -1,11 +1,19 @@
 {
-  perSystem = {pkgs, ...}: rec {
-    packages.ui = pkgs.callPackage ./ui.nix {};
-    packages.mvc = pkgs.callPackage ./mvc.nix {
-      ui = packages.ui;
-    };
-    packages.docker = pkgs.callPackage ./docker_img.nix {
-      drv = packages.mvc;
+  perSystem = {
+    self',
+    pkgs,
+    ...
+  }: {
+    packages = {
+      default = self'.packages.towork;
+
+      client = pkgs.callPackage ./client.nix {};
+      towork = pkgs.callPackage ./towork.nix {
+        inherit (self'.packages) client;
+      };
+      toworkDocker = pkgs.callPackage ./docker_img.nix {
+        drv = self'.packages.towork;
+      };
     };
   };
 }

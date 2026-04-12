@@ -2,17 +2,16 @@
   lib,
   buildDotnetModule,
   dotnetCorePackages,
-  ui,
+  client,
 }: let
   inherit (lib.fileset) toSource unions fileFilter;
-  inherit (lib.fileset) trace;
 
   # NOTE: the root dir of the project!
-  root = ../src/ToworkMVC;
+  root = ../src/towork;
 
   src = builtins.path {
     path = toSource {inherit root fileset;};
-    name = "mvc-root";
+    name = "towork-root";
   };
 
   fileset = unions [
@@ -21,9 +20,8 @@
     (root + "/wwwroot")
   ];
 in
-  trace fileset
   buildDotnetModule rec {
-    pname = "ToworkMVC";
+    pname = "towork";
     version = "0.1.0";
     inherit src;
     dotnet-sdk = dotnetCorePackages.sdk_10_0;
@@ -37,8 +35,8 @@ in
 
     postInstall = ''
       mkdir -p $out/lib/${pname}/wwwroot
-      cp -r ${ui}/. $out/lib/${pname}/wwwroot/
+      cp -r ${client}/. $out/lib/${pname}/wwwroot/
     '';
 
-    meta.mainProgram = "ToworkMVC";
+    meta.mainProgram = "towork";
   }

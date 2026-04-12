@@ -1,5 +1,5 @@
 {
-  description = "Description for the project";
+  description = "A webapp for your tasks!";
 
   inputs = {
     flake-parts.url = "github:hercules-ci/flake-parts";

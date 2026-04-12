@@ -4,10 +4,10 @@
   nodejs_20,
 }:
 stdenv.mkDerivation (finalAttrs: {
-  pname = "towork-ui";
+  pname = "towork-client";
   version = "0.1.0";
 
-  src = ../src/towork-ui;
+  src = ../src/client;
 
   nativeBuildInputs = [pnpm_9 nodejs_20];
 
