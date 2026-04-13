@@ -19,4 +19,38 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
     <PackageReference Include="Scalar.AspNetCore" Version="2.12.18" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+
+    <!-- Informações básicas do pacote -->
+    <PackageId>towork-webapp</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>CaueAnjos</Authors>
+    <Title>ToWork-Webapp</Title>
+    <Description>A webapp for your tasks!</Description>
+
+    <!-- Licença e README -->
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+
+    <!-- Tags do pacote -->
+    <PackageTags>taskmanager;todo-list</PackageTags>
+
+    <!-- Notas de versão -->
+    <PackageReleaseNotes>First Release</PackageReleaseNotes>
+
+    <!-- Informações do repositório -->
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/CaueAnjos/towork-webapp</RepositoryUrl>
+    <RepositoryBranch>main</RepositoryBranch>
+    <RepositoryCommit>abcd1234efgh5678ijkl9012mnopqrst</RepositoryCommit>
+
+    <PackAsTool>true</PackAsTool>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+    <None Include="LICENSE" Pack="true" PackagePath="\" />
+  </ItemGroup>
 </Project>

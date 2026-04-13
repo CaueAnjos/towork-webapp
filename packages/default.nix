@@ -1,4 +1,8 @@
-{
+{inputs, ...}: {
+  imports = [
+    inputs.flake-parts.flakeModules.bundlers
+  ];
+
   perSystem = {
     self',
     pkgs,
@@ -14,6 +18,13 @@
       toworkDocker = pkgs.callPackage ./docker_img.nix {
         drv = self'.packages.towork;
       };
+    };
+
+    bundlers = let
+      inherit (inputs.bundlers) bundlers;
+    in {
+      deb = bundlers.${pkgs.system}.toDEB;
+      rpm = bundlers.${pkgs.system}.toRPM;
     };
   };
 }

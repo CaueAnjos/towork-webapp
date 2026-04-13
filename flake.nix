@@ -5,6 +5,10 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     nixpkgs.url = "github:NixOS/nixpkgs/25.11";
     systems.url = "github:nix-systems/default";
+    bundlers = {
+      url = "github:NixOS/bundlers";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = inputs @ {flake-parts, ...}:
@@ -12,7 +16,7 @@
       systems = import inputs.systems;
       imports = [
         ./scripts
-        ./packages
+        (import ./packages {inherit inputs;})
       ];
 
       perSystem = {pkgs, ...}: {

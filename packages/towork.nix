@@ -26,12 +26,18 @@ in
     inherit src;
     dotnet-sdk = dotnetCorePackages.sdk_10_0;
     dotnet-runtime = dotnetCorePackages.aspnetcore_10_0-bin;
+    packNupkg = true;
     nugetDeps = ./deps.json;
     makeWrapperArgs = [
       "--set"
       "DOTNET_CONTENTROOT"
       "${placeholder "out"}/lib/${pname}"
     ];
+
+    preInstall = ''
+      cp ${./../README.md} "README.md"
+      cp ${./../LICENSE} "LICENSE"
+    '';
 
     postInstall = ''
       mkdir -p $out/lib/${pname}/wwwroot
