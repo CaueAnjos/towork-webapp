@@ -34,14 +34,13 @@ in
       "${placeholder "out"}/lib/${pname}"
     ];
 
-    preInstall = ''
+    preBuild = ''
       cp ${./../README.md} "README.md"
       cp ${./../LICENSE} "LICENSE"
-    '';
 
-    postInstall = ''
-      mkdir -p $out/lib/${pname}/wwwroot
-      cp -r ${client}/. $out/lib/${pname}/wwwroot/
+      rm -rf "wwwroot"
+      mkdir -p "wwwroot"
+      cp -r ${client}/. "wwwroot"
     '';
 
     meta.mainProgram = "towork";

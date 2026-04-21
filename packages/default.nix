@@ -6,6 +6,8 @@
   perSystem = {
     self',
     pkgs,
+    lib,
+    config,
     ...
   }: {
     packages = {
@@ -21,10 +23,34 @@
     };
 
     bundlers = let
-      inherit (inputs.bundlers) bundlers;
+      inherit (lib) elem concatLines forEach;
+
+      bundlers = inputs.bundlers.bundlers.${pkgs.system};
+      formats = ["deb" "rpm" "appimage"];
+      outPath = "$out/artifacts";
+
+      mkBundle = drv: format: let
+        bundlePath = self'.bundlers.${format} drv;
+        copyCommand = "cp -r ${bundlePath} ${outPath}/${format}";
+        mkdirCommand = "mkdir -p ${outPath}/${format}";
+      in
+        if !elem format ["appimage"]
+        then copyCommand
+        else concatLines [mkdirCommand copyCommand];
+      mkDeployBundle = drv: concatLines (forEach formats (format: mkBundle drv format));
     in {
-      deb = bundlers.${pkgs.system}.toDEB;
-      rpm = bundlers.${pkgs.system}.toRPM;
+      deb = bundlers.toDEB;
+      rpm = bundlers.toRPM;
+      appimage = bundlers.toAppImage;
+
+      default = self'.bundlers.deploy;
+      deploy = drv:
+        pkgs.runCommandLocal "deploy" {} ''
+          mkdir -p "${outPath}"
+          ${mkDeployBundle drv}
+
+          cp -r "${self'.packages.towork}/share/nuget/source/${self'.packages.towork.pname}/0.1.0/" "${outPath}/nuget"
+        '';
     };
   };
 }
