@@ -46,6 +46,7 @@
 
           env = {
             DOCKER_COMMAND = "podman";
+            DOTNET_ROOT = "${pkgs.dotnetCorePackages.sdk_10_0}/share/dotnet";
           };
 
           shellHook = let
