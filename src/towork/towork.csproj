@@ -44,7 +44,7 @@
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/CaueAnjos/towork-webapp</RepositoryUrl>
     <RepositoryBranch>main</RepositoryBranch>
-    <RepositoryCommit>abcd1234efgh5678ijkl9012mnopqrst</RepositoryCommit>
+    <RepositoryCommit>814f0630bd4316c8c3bd72ef238adc352a72035e</RepositoryCommit>
 
     <PackAsTool>true</PackAsTool>
   </PropertyGroup>
