@@ -26,8 +26,8 @@
       inherit (lib) elem concatLines forEach;
 
       bundlers = inputs.bundlers.bundlers.${pkgs.system};
-      formats = ["deb" "rpm" "appimage"];
-      outPath = "$out/artifacts";
+      formats = ["deb" "rpm" "appimage" "nupkg"];
+      outPath = "$out/${pkgs.system}";
 
       mkBundle = drv: format: let
         bundlePath = self'.bundlers.${format} drv;
@@ -42,14 +42,19 @@
       deb = bundlers.toDEB;
       rpm = bundlers.toRPM;
       appimage = bundlers.toAppImage;
+      nupkg = drv: let
+        nupkg = "${drv.pname}.${drv.version}.nupkg";
+      in
+        pkgs .runCommandLocal "nupkg" {} ''
+          mkdir -p $out
+          cp ${drv}/share/nuget/source/${drv.pname}/0.1.0/${nupkg} $out/${nupkg}
+        '';
 
       default = self'.bundlers.deploy;
       deploy = drv:
         pkgs.runCommandLocal "deploy" {} ''
           mkdir -p "${outPath}"
           ${mkDeployBundle drv}
-
-          cp -r "${self'.packages.towork}/share/nuget/source/${self'.packages.towork.pname}/0.1.0/" "${outPath}/nuget"
         '';
     };
   };

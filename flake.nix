@@ -19,13 +19,15 @@
         (import ./packages {inherit inputs;})
       ];
 
-      perSystem = {pkgs, ...}: {
+      perSystem = {pkgs, ...}: let
+        dotnet = pkgs.dotnetCorePackages.dotnet_10;
+      in {
         devShells.default = pkgs.mkShellNoCC {
           name = "dev";
           packages = with pkgs; [
             # NOTE: C#
             csharpier
-            dotnetCorePackages.sdk_10_0
+            dotnet.sdk
 
             # NOTE: js/ts
             nodejs_20
@@ -46,7 +48,7 @@
 
           env = {
             DOCKER_COMMAND = "podman";
-            DOTNET_ROOT = "${pkgs.dotnetCorePackages.sdk_10_0}/share/dotnet";
+            DOTNET_ROOT = "${dotnet.sdk}/share/dotnet";
           };
 
           shellHook = let

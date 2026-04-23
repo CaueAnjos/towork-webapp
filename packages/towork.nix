@@ -19,13 +19,15 @@
     (root + "/Views")
     (root + "/wwwroot")
   ];
+
+  dotnet = dotnetCorePackages.dotnet_10;
 in
   buildDotnetModule rec {
     pname = "towork";
     version = "0.1.0";
     inherit src;
-    dotnet-sdk = dotnetCorePackages.sdk_10_0;
-    dotnet-runtime = dotnetCorePackages.aspnetcore_10_0-bin;
+    dotnet-sdk = dotnet.sdk;
+    dotnet-runtime = dotnet.aspnetcore;
     packNupkg = true;
     nugetDeps = ./deps.json;
     makeWrapperArgs = [
