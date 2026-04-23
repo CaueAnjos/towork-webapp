@@ -26,7 +26,7 @@
       inherit (lib) elem concatLines forEach;
 
       bundlers = inputs.bundlers.bundlers.${pkgs.system};
-      formats = ["deb" "rpm" "appimage" "nupkg"];
+      formats = ["deb" "rpm" "appimage"];
       outPath = "$out/${pkgs.system}";
 
       mkBundle = drv: format: let

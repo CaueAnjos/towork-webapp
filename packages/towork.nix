@@ -28,7 +28,6 @@ in
     inherit src;
     dotnet-sdk = dotnet.sdk;
     dotnet-runtime = dotnet.aspnetcore;
-    packNupkg = true;
     nugetDeps = ./deps.json;
     makeWrapperArgs = [
       "--set"
