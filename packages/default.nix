@@ -45,7 +45,7 @@
       nupkg = drv: let
         nupkg = "${drv.pname}.${drv.version}.nupkg";
       in
-        pkgs .runCommandLocal "nupkg" {} ''
+        pkgs.runCommandLocal "nupkg" {} ''
           mkdir -p $out
           cp ${drv}/share/nuget/source/${drv.pname}/0.1.0/${nupkg} $out/${nupkg}
         '';
