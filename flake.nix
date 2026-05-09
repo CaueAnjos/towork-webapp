@@ -19,9 +19,22 @@
         (import ./packages {inherit inputs;})
       ];
 
-      perSystem = {pkgs, ...}: let
+      perSystem = {
+        pkgs,
+        system,
+        ...
+      }: let
         dotnet = pkgs.dotnetCorePackages.dotnet_10;
       in {
+        _module.args.pkgs = import inputs.nixpkgs {
+          inherit system;
+          config = {
+            allowUnfree = true;
+            allowUnsupportedSystem = true;
+            microsoftVisualStudioLicenseAccepted = true;
+          };
+        };
+
         devShells.default = pkgs.mkShellNoCC {
           name = "dev";
           packages = with pkgs; [

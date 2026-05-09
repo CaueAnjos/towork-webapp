@@ -3,6 +3,7 @@
   buildDotnetModule,
   dotnetCorePackages,
   client,
+  dotnetBuildFlags ? null,
 }: let
   inherit (lib.fileset) toSource unions fileFilter;
 
@@ -25,7 +26,7 @@ in
   buildDotnetModule rec {
     pname = "towork";
     version = "0.1.0";
-    inherit src;
+    inherit src dotnetBuildFlags;
     dotnet-sdk = dotnet.sdk;
     dotnet-runtime = dotnet.aspnetcore;
     nugetDeps = ./deps.json;

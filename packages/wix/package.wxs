@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="*"
+           Name="%NAME%"
+           Manufacturer="%CORP%"
+           Version="%VERSION%"
+           Language="1033"
+           UpgradeCode="%CODE%">
+
+    <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+    <MediaTemplate EmbedCab="yes" />
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="%NAME%">
+          <Component Id="MainComponent" Guid="%MAIN_UUID%">
+            <File Id="%NAME%" Source="%BIN%" KeyPath="yes" />
+          </Component>
+        </Directory>
+      </Directory>
+    </Directory>
+
+    <Feature Id="MainFeature" Title="Main Feature" Level="1">
+      <ComponentRef Id="MainComponent" />
+    </Feature>
+
+  </Product>
+</Wix>

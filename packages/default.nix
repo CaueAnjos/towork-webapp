@@ -20,6 +20,11 @@
       toworkDocker = pkgs.callPackage ./docker_img.nix {
         drv = self'.packages.towork;
       };
+
+      toworkWindows = pkgs.callPackage ./towork.nix {
+        client = pkgs.callPackage ./client.nix {};
+        dotnetBuildFlags = "--os ";
+      };
     };
 
     bundlers = let
@@ -49,6 +54,26 @@
           mkdir -p $out
           cp ${drv}/share/nuget/source/${drv.pname}/0.1.0/${nupkg} $out/${nupkg}
         '';
+      msi = drv:
+        pkgs.stdenvNoCC.mkDerivation {
+          inherit (drv) version;
+          pname = "${drv.pname}-msi";
+          src = ./wix;
+          nativeBuildInputs = with pkgs; [msitools util-linux];
+          patchPhase = ''
+            substituteInPlace "package.wxs" \
+                --replace-fail "%BIN%" "${lib.getExe drv}" \
+                --replace-fail "%NAME%" "${drv.pname}" \
+                --replace-fail "%VERSION%" "${drv.version}" \
+                --replace-fail "%CODE%" "{$(uuidgen)}" \
+                --replace-fail "%MAIN_UUID%" "{$(uuidgen)}" \
+                --replace-fail "%CORP%" "${drv.pname}"
+          '';
+          buildPhase = ''
+            mkdir -p "$out/msi"
+            wixl package.wxs -o "$out/msi/${drv.pname}.msi"
+          '';
+        };
 
       default = self'.bundlers.deploy;
       deploy = drv:
