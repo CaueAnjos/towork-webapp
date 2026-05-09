@@ -36,14 +36,9 @@ in
       "${placeholder "out"}/lib/${pname}"
     ];
 
-    preBuild = ''
-      cp ${./../README.md} "README.md"
-      cp ${./../LICENSE} "LICENSE"
-
+    patchPhase = ''
       rm -rf "wwwroot"
       mkdir -p "wwwroot"
       cp -r ${client}/. "wwwroot"
     '';
-
-    meta.mainProgram = "towork";
   }
