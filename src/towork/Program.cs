@@ -12,10 +12,17 @@ builder.Services.AddOpenApi();
 builder.Services.AddTransient<ITasksService, TasksService>();
 builder.Services.AddDbContext<TasksContext>(options =>
 {
-    string? connectionString = builder.Configuration.GetConnectionString("TasksContext");
-    if (connectionString is not null)
+    // Prefer explicit env var for DB selection
+    var envConn = Environment.GetEnvironmentVariable("TOWORK_DB");
+    var configConn = builder.Configuration.GetConnectionString("TasksContext");
+
+    if (!string.IsNullOrWhiteSpace(envConn))
     {
-        options.UseNpgsql(connectionString);
+        options.UseNpgsql(envConn);
+    }
+    else if (!string.IsNullOrWhiteSpace(configConn))
+    {
+        options.UseNpgsql(configConn);
     }
     else
     {
