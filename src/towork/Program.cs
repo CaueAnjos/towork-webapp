@@ -50,12 +50,23 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
+// Apply migrations at startup for both providers.
+// Wrapped in try/catch to avoid failures during build-time tooling (OpenAPI, cross-publish, etc.)
+try
 {
+    using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<TasksContext>();
+
     if (db.Database.IsSqlite())
     {
-        db.Database.EnsureCreated();
+        db.Database.Migrate();
+    }
+}
+catch
+{
+    if (app.Environment.IsProduction())
+    {
+        app.Logger.LogCritical("Database could not be migrated");
     }
 }
 
